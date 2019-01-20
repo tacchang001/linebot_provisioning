@@ -1,0 +1,9 @@
+server {
+    listen 80;
+    server_name 192.168.56.111;
+
+    location / {
+        include uwsgi_params;
+        uwsgi_pass unix:/home/devel/bot_fx_helloworld/bot_fx_helloworld.sock;
+    }
+}
