@@ -21,11 +21,13 @@
       - zlib1g-dev
       - libssl-dev
 #      - tree         # Optional
-#     - python-pip   # Optional
-#     - python-dev   # Optional
+      - python-pip   # Optional
+      - python-dev   # Optional
       - python3-pip
       - python3-dev
       - nginx
+      - python-pandas
+      - python-pandas-lib
   - name: install pip modules
     pip:
       name: 
