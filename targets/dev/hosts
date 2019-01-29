@@ -1,7 +1,8 @@
+
 [test-server]
 192.168.56.111
+
 [test-server:vars]
-ansible_ssh_user=devel
 github_user=tacchang001
 app_name=bot_fx_helloworld
 python_version=3.4
