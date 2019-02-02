@@ -1,30 +1,30 @@
-- name: template service config
+- name: uWSGIサーバをサービス化するファイルをホストからターゲットにコピーする
   copy:
     src: "files/{{ app_name }}.conf"
     dest: "/etc/init/{{ app_name }}.conf"
 
-- name: start app service
+- name: uWSGIサーバを起動する
   service: name={{ app_name }} state=restarted enabled=yes
 
-- name: template nginx site config
+- name: ウェブサーバ（Nginx）にuWSGIとの連携を設定する
   template:
     src: "files/{{ app_name }}.nginx"
     dest: /etc/nginx/sites-available/{{ app_name }}
 
-- name: remove default nginx site config
+- name: Nginxのデフォルトサイトは消す（好み）
   file: path=/etc/nginx/sites-enabled/default state=absent
 
-- name: enable nginx site
+- name: Nginxサーバが通常起動となるように設定をしておく
   file:
     src: /etc/nginx/sites-available/{{ app_name }}
     dest: /etc/nginx/sites-enabled/default
     state: link
     force: yes
 
-- name: restart nginx
+- name: Nginxを起動する
   service: name=nginx state=restarted enabled=yes
 
-- name: open firewall for nginx
+- name: ファイヤウォールでNginxは許可する
   ufw:
     rule: allow
     name: Nginx Full

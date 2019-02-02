@@ -1,16 +1,16 @@
-- name: update cache
+- name: python3-{pip,dev}をapt install する準備
   apt:
     name: python-software-properties
     state: present
     update_cache: yes
     cache_valid_time: 43200
 
-- name: install base packages
+- name: 基本パッケージのインストール
   apt: name={{item}} state=installed
   with_items:
     - "{{ base_packages }}"
 
-- name: install pip modules
+- name: グローバル属性のPythonパッケージをインストールする
   pip: name={{item}}
   with_items:
     - "{{ python_packages }}"

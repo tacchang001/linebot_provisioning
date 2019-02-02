@@ -1,12 +1,12 @@
-- name: get url
+- name: サイトがインストールされているか確認するため、先ず、アクセスした結果をファイル落とす。
   get_url:
     url: http://{{inventory_hostname}}
     dest: /tmp/index.html
 
-- name: read html
+- name: 落としたファイルを開いてみる
   shell: cat /tmp/index.html
   register: html_contents
 
-- name: check for string in html
+- name: あるはずのキーワードがあればOK
   when: html_contents.stdout.find('hello') != -1
   debug: msg="success!"
