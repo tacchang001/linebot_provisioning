@@ -1,6 +1,6 @@
 - name: template service config
   copy:
-    src: "{{ app_name }}.conf"
+    src: "files/{{ app_name }}.conf"
     dest: "/etc/init/{{ app_name }}.conf"
 
 - name: start app service
@@ -8,7 +8,7 @@
 
 - name: template nginx site config
   template:
-    src: "{{ app_name }}.nginx"
+    src: "files/{{ app_name }}.nginx"
     dest: /etc/nginx/sites-available/{{ app_name }}
 
 - name: remove default nginx site config

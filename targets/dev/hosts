@@ -5,5 +5,4 @@
 [test-server:vars]
 github_user=tacchang001
 app_name=bot_fx_helloworld
-python_version=3.4
-venv_name=botenv
+

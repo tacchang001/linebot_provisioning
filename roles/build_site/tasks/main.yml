@@ -14,6 +14,3 @@
     requirements: /home/{{ ansible_ssh_user }}/{{ app_name }}/requirements.txt
     virtualenv: /home/{{ ansible_ssh_user }}/{{ venv_name }}
     virtualenv_python: python{{python_version}}
-
-- name: print HOME environment variable
-  debug: msg={{ ansible_env.USER }}
