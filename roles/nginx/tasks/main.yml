@@ -1,2 +1,30 @@
-- name: test vars in roles
-  debug: msg={{ http_packages }}
+- name: template service config
+  copy:
+    src: "{{ app_name }}.conf"
+    dest: "/etc/init/{{ app_name }}.conf"
+
+- name: start app service
+  service: name={{ app_name }} state=restarted enabled=yes
+
+- name: template nginx site config
+  template:
+    src: "{{ app_name }}.nginx"
+    dest: /etc/nginx/sites-available/{{ app_name }}
+
+- name: remove default nginx site config
+  file: path=/etc/nginx/sites-enabled/default state=absent
+
+- name: enable nginx site
+  file:
+    src: /etc/nginx/sites-available/{{ app_name }}
+    dest: /etc/nginx/sites-enabled/default
+    state: link
+    force: yes
+
+- name: restart nginx
+  service: name=nginx state=restarted enabled=yes
+
+- name: open firewall for nginx
+  ufw:
+    rule: allow
+    name: Nginx Full

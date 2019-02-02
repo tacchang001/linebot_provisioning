@@ -1,0 +1,16 @@
+- name: update cache
+  apt:
+    name: python-software-properties
+    state: present
+    update_cache: yes
+    cache_valid_time: 43200
+- name: install base packages
+  apt: name={{item}} state=installed
+#  debug: var=item.stdout_lines
+  with_items:
+    - "{{ base_packages }}"
+- name: install pip modules
+  pip: name={{item}}
+#  debug: var=item.stdout_lines
+  with_items:
+    - "{{ python_packages }}"

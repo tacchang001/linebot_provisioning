@@ -1,0 +1,19 @@
+- name: Manually create the initial virtualenv
+  command: virtualenv /home/{{ ansible_ssh_user }}/{{ venv_name }} -p python{{python_version}} creates='/home/{{ ansible_ssh_user }}/{{ venv_name }}'
+
+- stat: path=/home/{{ ansible_ssh_user }}/{{ app_name }}
+  register: f
+- name: clone repo
+  git:
+    repo: git@github.com:{{ github_user }}/{{ app_name }}.git
+    dest: /home/{{ ansible_ssh_user }}/{{ app_name }}
+    accept_hostkey: yes
+
+- name: install modules in a virtualenv
+  pip:
+    requirements: /home/{{ ansible_ssh_user }}/{{ app_name }}/requirements.txt
+    virtualenv: /home/{{ ansible_ssh_user }}/{{ venv_name }}
+    virtualenv_python: python{{python_version}}
+
+- name: print HOME environment variable
+  debug: msg={{ ansible_env.USER }}

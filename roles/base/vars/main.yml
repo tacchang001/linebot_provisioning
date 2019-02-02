@@ -1,0 +1,15 @@
+base_packages:
+  - git
+  - build-essential
+  - zlib1g-dev
+  - libssl-dev
+  - python-pip
+  - python-dev
+  - python3-pip
+  - python3-dev
+  - nginx
+  - python-pandas
+  - python-pandas-lib
+
+python_packages:
+  - virtualenv

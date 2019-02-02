@@ -1,0 +1,13 @@
+- hosts: all
+# ターゲットの情報を取得しない : gather_facts: false
+#  gather_facts: false
+  remote_user: devel
+#  become: yes
+#  become_method: sudo
+  vars:
+    local_home: "{{ lookup('env', 'HOME') }}"
+  tasks:
+  - name: print HOME environment variable
+    debug: msg={{ansible_env.HOME}}
+#  - name: print HOME env var
+#    debug:  msg="{{local_home}}"
