@@ -8,4 +8,4 @@ setgid www-data
 
 env PATH=/home/{{ ansible_ssh_user }}/{{ venv_name }}/bin
 chdir /home/{{ ansible_ssh_user }}/{{ app_name }}
-exec uwsgi --ini {{ app_name }}.ini
+exec uwsgi --ini uwsgi.ini
