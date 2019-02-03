@@ -1,0 +1,14 @@
+#
+- hosts: test-server
+#  gather_facts: false
+  remote_user: "{{ user_to_work }}"
+#  become: yes
+  become_method: sudo
+  vars_files:
+    - vars/site.yml
+  roles:
+    - { role: base, become: yes }
+    - { role: build_site, become: no }
+    - { role: nginx-uwsgi, become: yes }
+    - { role: check-nginx, become: yes }
+

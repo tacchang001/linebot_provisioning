@@ -1,0 +1,70 @@
+- name: パッケージインストール
+  apt: name={{ item }} state=installed
+  with_items:
+    - nginx
+    - openssl
+    - python-openssl
+
+  # uWSGI
+- name: uWSGIサーバをサービス化するファイルをホストからターゲットにコピーする
+  template: src="uwsgi-service.conf.j2" dest="/etc/init/{{ app_name }}.conf"
+- name: uWSGIサーバを起動する
+  service: name={{ app_name }} state=restarted enabled=yes
+
+  # LetsEncrypt向けの nginx の準備
+- name: default設定ファイルを削除する
+  file: path="/etc/nginx/sites-enabled/default" state=absent
+- name: LetsEncrypt用の nginx の設定ファイルを配置する
+  template: src="letsencrypt.conf.j2" dest="/etc/nginx/sites-available/letsencrypt.conf"
+- name: LetsEncrypt用の nginx の設定ファイルをリンクする
+  file: src="/etc/nginx/sites-available/letsencrypt.conf" dest="/etc/nginx/sites-enabled/letsencrypt.conf" state=link
+- name: nginx を reload
+  service: name=nginx state=reloaded
+# ディレクトリの準備
+- name: letsencrypt ACMEチャレンジ用ディレクトリを作成する
+  file: path=/var/www/letsencrypt/.well-known/acme-challenge state=directory owner="{{ ansible_ssh_user }}" group="{{ ansible_ssh_user }}"
+- name: サーバー証明書用のディレクトリを作成する
+  file: path=/etc/ssl/{{ domain_name }} state=directory
+# 鍵の準備
+- name: LetsEncrypt のアカウント鍵を生成する
+  openssl_privatekey: path=/etc/ssl/{{ domain_name }}/account.key
+- name: サーバー証明書の秘密鍵を作成する
+  openssl_privatekey: path=/etc/ssl/{{ domain_name }}/domain.key
+- name: サーバー証明書の署名要求ファイルを作成する
+  command: openssl req -new -key domain.key -out {{ domain_name }}.csr -subj "/C=JP/ST=Kanagawa/L=Kawasaki/O=zenwerk/CN={{ domain_name }}" chdir=/etc/ssl/{{ domain_name }} creates={{ domain_name }}.csr
+# 証明書を取得する
+- name: LetsEncrypt にチャレンジ要求を行う
+  letsencrypt:
+    acme_directory: https://acme-v01.api.letsencrypt.org/directory
+    account_key: /etc/ssl/{{ domain_name }}/account.key
+    csr: /etc/ssl/{{ domain_name }}/{{ domain_name }}.csr
+    dest: /etc/ssl/{{ domain_name }}/cert.pem
+    remaining_days: 90
+  register: acme_challenge
+- name: LetsEncrypt のチャレンジ要求を設定する
+  become: no
+  copy:
+    dest: /var/www/letsencrypt/{{ acme_challenge['challenge_data'][domain_name]['http-01']['resource'] }}
+    content: "{{ acme_challenge['challenge_data'][domain_name]['http-01']['resource_value'] }}"
+  when: acme_challenge|changed
+- name: LetsEncrypt のチャレンジを実施し証明書を取得する
+  letsencrypt:
+    acme_directory: https://acme-v01.api.letsencrypt.org/directory
+    account_key: /etc/ssl/{{ domain_name }}/account.key
+    csr: /etc/ssl/{{ domain_name }}/{{ domain_name }}.csr
+    dest: /etc/ssl/{{ domain_name }}/cert.pem
+    remaining_days: 90
+    data: "{{ acme_challenge }}"
+# 中間証明書の準備
+- name: LetsEncrypt の中間証明書を取得する
+  get_url:
+    url: "{{ letsencrypt_intermidiate_ca }}"
+    dest: /etc/ssl/{{ domain_name }}/chain.pem
+- name: 中間証明書を作成する
+  shell: cat cert.pem chain.pem > fullchain.pem chdir=/etc/ssl/{{ domain_name }}
+# コンテンツ配信向けの nginx の準備
+- name: コンテンツ配信用の nginx の設定ファイルを配置する
+  template: src="letsencrypt-web.conf.j2" dest="/etc/nginx/sites-available/web.conf"
+- name: コンテンツ配信用の nginx の設定ファイルをリンクする
+  file: src="/etc/nginx/sites-available/web.conf" dest="/etc/nginx/sites-enabled/web.conf" state=link
+  notify: reload nginx

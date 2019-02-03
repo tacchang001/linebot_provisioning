@@ -1,0 +1,23 @@
+server {
+    listen 443 ssl;
+    client_max_body_size 20M;
+    server_name {{ domain_name }};
+
+    ssl_certificate      /etc/ssl/{{ domain_name }}/fullchain.pem;
+    ssl_certificate_key  /etc/ssl/{{ domain_name }}/domain.key;
+
+    ssl_session_cache    shared:SSL:1m;
+    ssl_session_timeout  5m;
+
+    ssl_ciphers  HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers  on;
+
+    index index.html index.htm index.nginx-debian.html;
+    root /var/www/html/;
+
+    location / {
+        try_files $uri $uri/ =404;
+        include uwsgi_params;
+        uwsgi_pass unix:/home/{{ ansible_ssh_user }}/{{ app_name }}/{{ app_name }}.sock;
+    }
+}

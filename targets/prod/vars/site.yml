@@ -1,0 +1,11 @@
+# User to work
+user_to_work: devel
+#
+venv_name: botenv
+python_version: 3.4
+#
+domain_name: tacchang.xyz
+domain_admin_mail: user001@tacchang.xyz
+
+#
+letsencrypt_intermidiate_ca: https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem.txt

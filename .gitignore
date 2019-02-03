@@ -108,3 +108,7 @@ venv.bak/
 
 # PyCharm
 .idea/
+
+# Ansible-galaxy
+roles/thefinn93.letsencrypt/
+roles/jaywink.letsencrypt/

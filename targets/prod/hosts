@@ -1,0 +1,8 @@
+
+[test-server]
+36.55.229.156:3843
+
+[test-server:vars]
+github_user=tacchang001
+app_name=fx
+
