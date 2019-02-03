@@ -17,7 +17,12 @@ server {
 
     location / {
         try_files $uri $uri/ =404;
+    }
+
+    location ~ ^/bot/(.*)$ {
         include uwsgi_params;
         uwsgi_pass unix:/home/{{ ansible_ssh_user }}/{{ app_name }}/{{ app_name }}.sock;
+        uwsgi_param SCRIPT_NAME /bot;
+        uwsgi_param PATH_INFO /$1;
     }
 }
