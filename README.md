@@ -24,3 +24,15 @@ git@github.com:tacchang001/bot_fx_helloworld.git
 ```
  ansible-playbook -i hosts site.yml --private-key ~/.ssh/秘密鍵 --ask-become-pass -vvv
 ```
+
+##  エラー対応
+
+### Internal Error
+
+uWSGI単体でサーバは機能しているか？
+
+
+```bash
+# https://qiita.com/morinokami/items/e0efb2ae2aa04a1b148b
+uwsgi --socket /tmp/uwsgi.sock --module wsgi --chmod-socket=666
+```
