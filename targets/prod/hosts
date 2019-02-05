@@ -1,6 +1,6 @@
 
 [test-server]
-36.55.229.156:3843
+123.456.789.012:
 
 [test-server:vars]
 github_user=tacchang001
